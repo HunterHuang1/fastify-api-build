@@ -33,7 +33,7 @@ fastify.register(projectRoutes, {
 });
 
 //can also add in routes side for each route
-// fastify.addHook("preHandler", auth);
+fastify.addHook("preHandler", auth.basicAuth);
 
 const start = async () => {
   try {
