@@ -1,4 +1,4 @@
-const fastify = require("fastify")({logger: true});
+const fastify = require("fastify")({ logger: true });
 const mongoose = require("mongoose");
 require("dotenv").config();
 
@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const userRoutes = require("./routes/user.routes");
 const projectRoutes = require("./routes/project.routes");
+const auth = require("./middlewares/auth");
 
 //connext dabase
 
@@ -31,6 +32,9 @@ fastify.register(projectRoutes, {
   prefix: "/api/v1/projects",
 });
 
+//can also add in routes side for each route
+// fastify.addHook("preHandler", auth);
+
 const start = async () => {
   try {
     //  fastify.listen({ port: process.env.PORT || 5000 });
@@ -38,7 +42,7 @@ const start = async () => {
     //   `Server is running on port ${fastify.server.address().port}`
     // );
 
-    await fastify.listen({port: process.env.PORT || 5000});
+    await fastify.listen({ port: process.env.PORT || 5000 });
     fastify.log.info(
       `server is running on port ${fastify.server.address().port}`
     );
