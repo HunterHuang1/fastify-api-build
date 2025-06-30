@@ -63,4 +63,42 @@ async function basicAuth(request, reply) {
   }
 }
 
-module.exports = { apiKeyAuth, basicAuth };
+async function login(request, reply, fastify) {
+  const { email, password } = request.body;
+
+  const user = await User.findOne({ email }).select([
+    "password",
+    "firstName",
+    "lastName",
+    "role",
+  ]);
+
+  if (!user) {
+    return reply.status(401).send({
+      message: "No such Email found",
+    });
+  }
+
+  const isMatch = await user.comparePassword(password);
+
+  if (!isMatch) {
+    return reply.status(401).send({
+      message: "No such Password found",
+    });
+  }
+
+  //if valid -> sign a token
+  const token = fastify.jwt.sign({
+    //token structure
+    payload: {
+      email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    },
+  });
+
+  reply.send({ token }); //based on the paylod email/password, get the token, which contains the info
+}
+
+module.exports = { apiKeyAuth, basicAuth, login };

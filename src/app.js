@@ -1,6 +1,7 @@
 const fastify = require("fastify")({ logger: true });
 const mongoose = require("mongoose");
 require("dotenv").config();
+const jwtPlugin = require("./plugins/jwtPlugin");
 
 //import my routes
 
@@ -10,7 +11,6 @@ const auth = require("./middlewares/auth");
 
 //connext dabase
 
-console.log("the current mongodb uri is --- ", process.env.MONGODB_URI);
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -24,6 +24,13 @@ mongoose
   });
 
 //start server
+
+//can decorate inside the fastify-plugin, if can access the fastify instance
+// fastify.register(require("@fastify/jwt"), {
+//   secret: process.env.JWT_SIGNING_SECRET,
+// });
+//register before the routes
+fastify.register(jwtPlugin);
 
 fastify.register(userRoutes, {
   prefix: "/api/v1/users",
